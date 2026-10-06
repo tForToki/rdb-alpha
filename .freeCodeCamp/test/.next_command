@@ -77,3 +77,6 @@ diff expected_output.txt test.txt
 diff expected_output.txt test.txt
 pg_dump -cC --inserts -U freecodecamp worldcup > worldcup.sql
 rm test.txt
+[ -d "$HOME/bin" ]
+[ -d "$HOME/.local/bin" ]
+'/vscode/bin/linux-x64/07f806f999227108933c2e30515b26eecc1fda74/node' -p '"4a630ede0887" + JSON.stringify(process.env) + "4a630ede0887"'

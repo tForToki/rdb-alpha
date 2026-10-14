@@ -9,6 +9,8 @@ read USERNAME
 DB_USERNAME=$($PSQL "SELECT username FROM guess_game WHERE username = '$USERNAME'")
 DB_GAMES_PLAYED=$($PSQL "SELECT games_played FROM guess_game WHERE username = '$USERNAME'")
 DB_BEST_GAME=$($PSQL "SELECT best_game FROM guess_game WHERE username = '$USERNAME'")
+GAMES_PLAYED=0
+BEST_GAME=1001
 
 if [[ -z $DB_USERNAME ]]
 then
@@ -16,3 +18,7 @@ then
 else
   echo "Welcome back, $DB_USERNAME! You have played $DB_GAMES_PLAYED games, and your best game took $DB_BEST_GAME guesses."
 fi
+
+INSERT(){
+  $($PSQL "INSERT INTO guess_game(username,games_played,best_game) VALUES('$USERNAME',$GAMES_PLAYED,$BEST_GAME)")
+}

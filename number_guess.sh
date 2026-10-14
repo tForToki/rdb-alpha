@@ -20,7 +20,11 @@ then
   while [[ $TARGET_NUMBER != $NUMBER ]]
   do
     read NUMBER
-    if [[ $TARGET_NUMBER > $NUMBER ]]
+    if [[ ! $NUMBER =~ ^[0-9]+$ ]]
+    then
+      echo -e "\nThat is not an integer, guess again:"
+      (( BEST_GAME += 1 ))    
+    elif [[ $TARGET_NUMBER > $NUMBER ]]
     then
       echo -e "\nIt's higher than that, guess again:"
       (( BEST_GAME += 1 ))
@@ -28,16 +32,40 @@ then
     then
       echo -e "\nIt's lower than that, guess again:"
       (( BEST_GAME += 1 ))
-    elif [[ ! "$NUMBER" =~ ^-?[0-9]+$ ]]
+    fi
+  done
+  (( BEST_GAME += 1 ))
+  (( GAMES_PLAYED += 1 ))
+  INSERT_INFO=$($PSQL "INSERT INTO guess_game(username,games_played,best_game) VALUES('$USERNAME',$GAMES_PLAYED,$BEST_GAME)")
+  echo -e "\nYou guessed it in $BEST_GAME tries. The secret number was $TARGET_NUMBER. Nice job!"
+else
+  echo -e "\nWelcome back, $DB_USERNAME! You have played $DB_GAMES_PLAYED games, and your best game took $DB_BEST_GAME guesses."
+  echo -e "\nGuess the secret number between 1 and 1000:"
+  while [[ $TARGET_NUMBER != $NUMBER ]]
+  do
+    read NUMBER
+    if [[ ! "$NUMBER" =~ ^-?[0-9]+$ ]]
     then
       echo -e "\nThat is not an integer, guess again:"
+      (( BEST_GAME += 1 ))
+    elif [[ $TARGET_NUMBER > $NUMBER ]]
+    then
+      echo -e "\nIt's higher than that, guess again:"
+      (( BEST_GAME += 1 ))
+    elif [[ $TARGET_NUMBER < $NUMBER ]]
+    then
+      echo -e "\nIt's lower than that, guess again:"
       (( BEST_GAME += 1 ))
     fi
   done
   (( BEST_GAME += 1 ))
-  (( GAME_PLAYED += 1 ))
-  INSERT_INFO=$($PSQL "INSERT INTO guess_game(username,games_played,best_game) VALUES('$USERNAME',$GAMES_PLAYED,$BEST_GAME)")
+  (( DB_GAMES_PLAYED += 1 ))
+
+  UPDATE_GAME=$($PSQL "UPDATE guess_game SET games_played = $DB_GAMES_PLAYED WHERE username='$DB_USERNAME'")
+  if [[ $BEST_GAME < $DB_BEST_GAME ]]
+  then
+    UPDATE_BEST=$($PSQL "UPDATE guess_game SET best_game = $BEST_GAME WHERE username='$DB_USERNAME'")
+  fi
   echo -e "\nYou guessed it in $BEST_GAME tries. The secret number was $TARGET_NUMBER. Nice job!"
-else
-  echo "Welcome back, $DB_USERNAME! You have played $DB_GAMES_PLAYED games, and your best game took $DB_BEST_GAME guesses."
+
 fi

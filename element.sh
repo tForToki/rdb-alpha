@@ -6,7 +6,7 @@ then
   echo "Please provide an element as an argument."
 
 else
-  if [[ $1  =~ ^[1-10]$ ]]
+  if [[ $1 =~ ^([1-9]|10)$ ]]
   then
 
     QUERY_INT=$($PSQL "SELECT properties.atomic_number,elements.symbol,
